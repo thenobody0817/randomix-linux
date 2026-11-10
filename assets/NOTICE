@@ -1,0 +1,21 @@
+Randomix — Linux port
+=====================
+
+This Linux port is a Flutter rewrite of the Android app Randomix
+(https://github.com/m-i-n-a-r/randomix), released under the MIT license.
+
+Original work:
+    Copyright (c) 2020 minar
+    https://github.com/m-i-n-a-r/randomix
+
+Reused from upstream, unmodified:
+    app/src/main/res/raw/roulette_sound.mp3
+    app/src/main/res/raw/coin_sound.wav
+    app/src/main/res/raw/magicball_sound.mp3
+    app/src/main/res/raw/dice_sound.wav
+    app/src/main/res/drawable-nodpi/intro_icon.png
+    app/src/main/res/drawable-nodpi/banner_minar.png
+    fastlane/metadata/android/en-US/images/icon.png
+    app/src/main/res/values/strings.xml (English strings, transcribed into lib/strings.dart)
+
+The MIT license text is available in LICENSE.upstream.md at the repository root.

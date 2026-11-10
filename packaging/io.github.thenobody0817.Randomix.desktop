@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Randomix
+GenericName=Random Decision Maker
+Comment=Choose randomly between numbers, answers, options and so on
+Exec=randomix
+Icon=io.github.thenobody0817.Randomix
+Terminal=false
+Categories=Utility;
+Keywords=random;choice;roulette;coin;dice;magic;
+StartupNotify=true
+StartupWMClass=io.github.thenobody0817.Randomix

@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Introduction -->
+    <color name="iconGreen">#0baf70</color>
+    <color name="iconViolet">#7e41c4</color>
+
+    <!-- Basic colors -->
+    <color name="colorAccent">@color/blue</color>
+    <color name="colorAccentDark">@color/blueDark</color>
+    <color name="colorAccentLight">@color/blueLight</color>
+    <color name="colorAccentTranslucent">@color/blueTranslucent</color>
+    <color name="goodGray">#959595</color>
+    <color name="goodGrayTranslucent">#66959595</color>
+    <color name="deepGray">#0f0f0f</color>
+    <color name="positiveGreen">#00c077</color>
+    <color name="negativeRed">#ee0000</color>
+
+    <!-- Light theme colors -->
+    <color name="colorBackground">#ffffff</color>
+    <color name="colorSurface">#f5f5f5</color>
+    <color name="textColorPrimary">#1f1f1f</color>
+    <color name="textColorSecondary">#252525</color>
+
+    <!-- Dark theme colors -->
+    <color name="colorBackgroundInverse">#1f1f1f</color>
+    <color name="colorSurfaceInverse">#2f2f2f</color>
+    <color name="textColorPrimaryInverse">#f0f0f0</color>
+    <color name="textColorSecondaryInverse">#e5e5e5</color>
+
+    <!-- Custom theme colors -->
+    <color name="aqua">#5abf95</color>
+    <color name="aquaDark">#1a7f55</color>
+    <color name="aquaLight">#8aefb5</color>
+    <color name="aquaTranslucent">#665abf95</color>
+
+    <color name="blue">#4285f4</color>
+    <color name="blueDark">#0245b4</color>
+    <color name="blueLight">#62a5ff</color>
+    <color name="blueTranslucent">#664285f4</color>
+
+    <color name="green">#3ddc84</color>
+    <color name="greenDark">#00ac54</color>
+    <color name="greenLight">#5dfca4</color>
+    <color name="greenTranslucent">#663ddc84</color>
+
+    <color name="yellow">#f4b400</color>
+    <color name="yellowDark">#c48400</color>
+    <color name="yellowLight">#ffd000</color>
+    <color name="yellowTranslucent">#66f4b400</color>
+
+    <color name="orange">#ff7522</color>
+    <color name="orangeDark">#cf5500</color>
+    <color name="orangeLight">#ffa552</color>
+    <color name="orangeTranslucent">#66ff7522</color>
+
+    <color name="teal">#008080</color>
+    <color name="tealDark">#005050</color>
+    <color name="tealLight">#00a0a0</color>
+    <color name="tealTranslucent">#66008080</color>
+
+    <color name="violet">#ab47bc</color>
+    <color name="violetDark">#7b178c</color>
+    <color name="violetLight">#cb67dc</color>
+    <color name="violetTranslucent">#66ab47bc</color>
+
+    <color name="pink">#ff66cc</color>
+    <color name="pinkDark">#cf269c</color>
+    <color name="pinkLight">#ff86ec</color>
+    <color name="pinkTranslucent">#66ff66cc</color>
+
+    <color name="lightBlue">#29b6f6</color>
+    <color name="lightBlueDark">#0986c6</color>
+    <color name="lightBlueLight">#40d0ff</color>
+    <color name="lightBlueTranslucent">#6629b6f6</color>
+
+    <color name="red">#ff5252</color>
+    <color name="redDark">#af2222</color>
+    <color name="redLight">#ff7272</color>
+    <color name="redTranslucent">#66ff5252</color>
+
+    <color name="lime">#c5de00</color>
+    <color name="limeDark">#95ae00</color>
+    <color name="limeLight">#e5fe00</color>
+    <color name="limeTranslucent">#66c5de00</color>
+
+    <color name="crimson">#dc143c</color>
+    <color name="crimsonDark">#ac040c</color>
+    <color name="crimsonLight">#fc345c</color>
+    <color name="crimsonTranslucent">#66dc143c</color>
+
+    <!-- M3 container roles, a tonal ramp per accent: tone 90 light, 30 dark, on- pair at 10 and 90 -->
+    <color name="aquaPrimaryContainer">#80f9c5</color>
+    <color name="aquaOnPrimaryContainer">#002114</color>
+    <color name="aquaSecondaryContainer">#c6ebd9</color>
+    <color name="aquaOnSecondaryContainer">#012115</color>
+    <color name="aquaTertiaryContainer">#b7efd4</color>
+    <color name="aquaOnTertiaryContainer">#002114</color>
+
+    <color name="bluePrimaryContainer">#dce1ff</color>
+    <color name="blueOnPrimaryContainer">#011b3e</color>
+    <color name="blueSecondaryContainer">#dce1ff</color>
+    <color name="blueOnSecondaryContainer">#131b30</color>
+    <color name="blueTertiaryContainer">#dce1ff</color>
+    <color name="blueOnTertiaryContainer">#061b3b</color>
+
+    <color name="greenPrimaryContainer">#66fea3</color>
+    <color name="greenOnPrimaryContainer">#00210d</color>
+    <color name="greenSecondaryContainer">#cbead4</color>
+    <color name="greenOnSecondaryContainer">#072010</color>
+    <color name="greenTertiaryContainer">#bfedcc</color>
+    <color name="greenOnTertiaryContainer">#00210d</color>
+
+    <color name="yellowPrimaryContainer">#ffdeab</color>
+    <color name="yellowOnPrimaryContainer">#251a01</color>
+    <color name="yellowSecondaryContainer">#f3e0c4</color>
+    <color name="yellowOnSecondaryContainer">#251a00</color>
+    <color name="yellowTertiaryContainer">#fadfb5</color>
+    <color name="yellowOnTertiaryContainer">#251a00</color>
+
+    <color name="orangePrimaryContainer">#fedbca</color>
+    <color name="orangeOnPrimaryContainer">#2e1501</color>
+    <color name="orangeSecondaryContainer">#fedbca</color>
+    <color name="orangeOnSecondaryContainer">#2c1606</color>
+    <color name="orangeTertiaryContainer">#fedbca</color>
+    <color name="orangeOnTertiaryContainer">#2e1501</color>
+
+    <color name="tealPrimaryContainer">#29fbfb</color>
+    <color name="tealOnPrimaryContainer">#002020</color>
+    <color name="tealSecondaryContainer">#bcebea</color>
+    <color name="tealOnSecondaryContainer">#002020</color>
+    <color name="tealTertiaryContainer">#a5f0ee</color>
+    <color name="tealOnTertiaryContainer">#002020</color>
+
+    <color name="violetPrimaryContainer">#fbd7ff</color>
+    <color name="violetOnPrimaryContainer">#35003f</color>
+    <color name="violetSecondaryContainer">#f3dbf5</color>
+    <color name="violetOnSecondaryContainer">#261529</color>
+    <color name="violetTertiaryContainer">#fbd7fe</color>
+    <color name="violetOnTertiaryContainer">#2b112f</color>
+
+    <color name="pinkPrimaryContainer">#fed8ee</color>
+    <color name="pinkOnPrimaryContainer">#3b012b</color>
+    <color name="pinkSecondaryContainer">#fbd9ed</color>
+    <color name="pinkOnSecondaryContainer">#2c1323</color>
+    <color name="pinkTertiaryContainer">#fed8ee</color>
+    <color name="pinkOnTertiaryContainer">#330d26</color>
+
+    <color name="lightBluePrimaryContainer">#c7e7ff</color>
+    <color name="lightBlueOnPrimaryContainer">#001e2d</color>
+    <color name="lightBlueSecondaryContainer">#c7e7ff</color>
+    <color name="lightBlueOnSecondaryContainer">#001e2d</color>
+    <color name="lightBlueTertiaryContainer">#c7e7ff</color>
+    <color name="lightBlueOnTertiaryContainer">#001e2d</color>
+
+    <color name="redPrimaryContainer">#ffdad6</color>
+    <color name="redOnPrimaryContainer">#3e0400</color>
+    <color name="redSecondaryContainer">#fedad6</color>
+    <color name="redOnSecondaryContainer">#2f1310</color>
+    <color name="redTertiaryContainer">#fedad6</color>
+    <color name="redOnTertiaryContainer">#370d08</color>
+
+    <color name="limePrimaryContainer">#d7ef27</color>
+    <color name="limeOnPrimaryContainer">#1c1d00</color>
+    <color name="limeSecondaryContainer">#e4e5c6</color>
+    <color name="limeOnSecondaryContainer">#1c1d01</color>
+    <color name="limeTertiaryContainer">#e4e6b7</color>
+    <color name="limeOnTertiaryContainer">#1c1d01</color>
+
+    <color name="crimsonPrimaryContainer">#fedad8</color>
+    <color name="crimsonOnPrimaryContainer">#400104</color>
+    <color name="crimsonSecondaryContainer">#fedad8</color>
+    <color name="crimsonOnSecondaryContainer">#2f1312</color>
+    <color name="crimsonTertiaryContainer">#fedad8</color>
+    <color name="crimsonOnTertiaryContainer">#380c0d</color>
+
+    <!-- Aliases used by the default (blue) theme -->
+    <color name="colorAccentPrimaryContainer">@color/bluePrimaryContainer</color>
+    <color name="colorAccentSecondaryContainer">@color/blueSecondaryContainer</color>
+    <color name="colorAccentTertiaryContainer">@color/blueTertiaryContainer</color>
+    <color name="colorAccentOnPrimaryContainer">@color/blueOnPrimaryContainer</color>
+    <color name="colorAccentOnSecondaryContainer">@color/blueOnSecondaryContainer</color>
+    <color name="colorAccentOnTertiaryContainer">@color/blueOnTertiaryContainer</color>
+
+    <!-- Tonal cards in the Amoled themes: a shade above black, or they would vanish -->
+    <color name="amoledTonalCard">#FF151515</color>
+</resources>

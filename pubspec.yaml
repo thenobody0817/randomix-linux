@@ -1,0 +1,31 @@
+name: randomix
+description: "An open source app to choose randomly between numbers, answers, options and so on."
+publish_to: 'none'
+
+# Version follows the upstream Android app (versionName 4.0); build number is the
+# Debian revision.
+version: 4.0.0+1
+
+environment:
+  sdk: ^3.13.7
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  provider: ^6.1.5+1
+  shared_preferences: ^2.5.6
+  audioplayers: ^6.8.1
+  url_launcher: ^6.3.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/sounds/
+    - assets/images/
