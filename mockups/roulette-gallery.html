@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Randomix — roulette spin animation gallery</title>
+<style>
+  :root{
+    --bg:#0d1117; --card:#161b22; --border:#232a34; --text:#e6edf3;
+    --muted:#8b949e; --accent:#4c8dff; --accent2:#a97bff;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:radial-gradient(1200px 600px at 18% -10%, #16213a 0%, var(--bg) 55%);
+    color:var(--text);
+    font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  header.top{
+    position:sticky; top:0; z-index:30; padding:16px 28px;
+    display:flex; gap:18px; align-items:center; flex-wrap:wrap;
+    background:rgba(13,17,23,.85); backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--border);
+  }
+  header.top h1{font-size:18px; margin:0 12px 0 0; letter-spacing:.2px}
+  header.top .sub{color:var(--muted); font-size:13px; max-width:520px; line-height:1.4}
+  header.top .spacer{flex:1}
+  .btn{
+    background:#1d2530; color:var(--text); border:1px solid var(--border);
+    padding:8px 14px; border-radius:10px; font-size:13px; cursor:pointer;
+    transition:.18s border-color,.18s background,.18s transform;
+  }
+  .btn:hover{border-color:var(--accent); background:#222c3a}
+  .btn:active{transform:translateY(1px)}
+  .btn.primary{background:linear-gradient(180deg,#4c8dff,#3b74d9); border-color:#4c8dff; color:#fff}
+  .btn.primary:hover{background:linear-gradient(180deg,#5b99ff,#4c8dff)}
+  .shortlist{font-size:13px; color:var(--muted); min-width:150px}
+  .shortlist b{color:var(--accent)}
+
+  main{
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr));
+    gap:18px; padding:24px 28px 70px; max-width:1560px; margin:0 auto;
+  }
+  .card{
+    background:linear-gradient(180deg,#171d26 0%,#12161d 100%);
+    border:1px solid var(--border); border-radius:18px; overflow:hidden;
+    display:flex; flex-direction:column;
+    transition:border-color .2s, box-shadow .2s, transform .2s;
+  }
+  .card.picked{
+    border-color:var(--accent);
+    box-shadow:0 0 0 1px var(--accent), 0 16px 46px -20px var(--accent);
+  }
+  .card header{display:flex; gap:12px; padding:14px 16px 8px; align-items:flex-start}
+  .num{
+    flex:none; width:30px; height:30px; border-radius:9px; display:grid; place-items:center;
+    background:#202a3a; color:#cfe0ff; font-size:13px; font-weight:700; border:1px solid #2c3a50;
+  }
+  .card h2{font-size:15px; margin:0 0 3px; font-weight:650}
+  .card .desc{font-size:12px; line-height:1.45; color:var(--muted); margin:0}
+  .card .meta{display:flex; gap:6px; margin-top:6px; flex-wrap:wrap}
+  .tag{
+    font-size:10px; letter-spacing:.4px; text-transform:uppercase; padding:2px 7px;
+    border-radius:999px; border:1px solid #303a49; color:#9fb2cc; background:#1a2230;
+  }
+  .tag.easy{color:#8ee6c0; border-color:#245c49; background:#12251e}
+  .tag.medium{color:#ffd48a; border-color:#5c4a20; background:#251e12}
+  .tag.hard{color:#ff9b9b; border-color:#5c2424; background:#251212}
+  .star{
+    margin-left:auto; flex:none; background:none; border:1px solid transparent; color:#5c6675;
+    font-size:18px; line-height:1; cursor:pointer; padding:4px 6px; border-radius:8px; transition:.18s;
+  }
+  .star:hover{color:#ffd166; background:#20293a}
+  .card.picked .star{color:#ffd166}
+
+  .stage{
+    position:relative; height:252px; display:flex; align-items:center; justify-content:center;
+    overflow:hidden; background:radial-gradient(circle at 50% 38%,#1a2130 0%,#0f131a 72%);
+    border-top:1px solid #1b222c; border-bottom:1px solid #1b222c;
+  }
+  .stage canvas{display:block}
+  .card footer{
+    padding:10px 14px 13px; display:flex; align-items:center; gap:10px; margin-top:auto;
+  }
+  .result{font-size:13px; color:var(--muted); flex:1; min-height:18px}
+  .result b{color:var(--text)}
+  .result .dot{display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px; vertical-align:middle}
+  .spin{margin-left:auto}
+
+  /* ---------- classic / variants ---------- */
+  .wheel-wrap{position:relative; display:grid; place-items:center}
+  .ticker{
+    position:absolute; width:70px; height:70px; border-radius:50%;
+    display:grid; place-items:center; text-align:center;
+    font-size:11px; font-weight:700; color:#dbe7ff; pointer-events:none;
+    background:radial-gradient(circle at 35% 30%,#233049,#141a24 75%);
+    border:1px solid #31415c; padding:4px;
+  }
+
+  /* ---------- slots / tape ---------- */
+  .slot-window{position:relative; width:190px; height:162px; overflow:hidden;
+    border-radius:14px; border:1px solid #263043; background:#0d131c;
+    -webkit-mask-image:linear-gradient(180deg,transparent,#000 22%,#000 78%,transparent);
+            mask-image:linear-gradient(180deg,transparent,#000 22%,#000 78%,transparent);}
+  .slot-strip{position:absolute; inset:0; will-change:transform}
+  .slot-item{height:54px; display:grid; place-items:center; font-weight:700; font-size:17px; letter-spacing:.3px}
+  .slot-band{position:absolute; left:6px; right:6px; top:54px; height:54px; border-radius:10px;
+    border:1px solid rgba(76,141,255,.5); background:rgba(76,141,255,.08); pointer-events:none}
+
+  .tape-window{position:relative; width:260px; height:84px; overflow:hidden;
+    border-radius:12px; border:1px solid #263043; background:#0d131c}
+  .tape-strip{position:absolute; top:0; left:0; height:100%; display:flex; align-items:center; will-change:transform}
+  .tape-item{width:96px; text-align:center; font-weight:700; font-size:15px}
+  .tape-marker{position:absolute; top:0; bottom:0; left:50%; width:2px; transform:translateX(-1px);
+    background:linear-gradient(180deg,transparent,#4c8dff,transparent)}
+
+  /* ---------- 3d ring / drum / coverflow ---------- */
+  .scene{width:250px; height:220px; perspective:900px; display:grid; place-items:center}
+  .ring,.drum{position:relative; width:150px; height:120px; transform-style:preserve-3d; will-change:transform}
+  .ring-item,.drum-item{
+    position:absolute; left:50%; top:50%; width:112px; height:56px; margin:-28px 0 0 -56px;
+    border-radius:12px; display:grid; place-items:center; font-size:13px; font-weight:700;
+    color:#0b0f15; backface-visibility:hidden; box-shadow:0 8px 20px -12px #000;
+  }
+  .drum{width:150px; height:70px}
+  .drum-item{width:120px; height:64px; margin:-32px 0 0 -60px}
+  .cover{position:relative; width:260px; height:180px; perspective:800px}
+  .cover-item{
+    position:absolute; left:50%; top:50%; width:120px; height:66px; margin:-33px 0 0 -60px;
+    border-radius:13px; display:grid; place-items:center; font-size:13px; font-weight:700;
+    color:#0b0f15; will-change:transform;
+  }
+
+  /* ---------- fan / flap / scramble ---------- */
+  .fan{position:relative; width:260px; height:210px}
+  .fan-card{
+    position:absolute; left:50%; bottom:18px; width:86px; height:120px; margin-left:-43px;
+    border-radius:12px; display:grid; place-items:center; font-size:12px; font-weight:700;
+    color:#0b0f15; transform-origin:50% 130%; transition:transform .5s cubic-bezier(.2,.8,.2,1), opacity .4s;
+    box-shadow:0 10px 22px -14px #000;
+  }
+  .fan-card.winner{transform:translateY(-56px) scale(1.14) rotate(0deg)!important; z-index:99;
+    box-shadow:0 20px 44px -16px #4c8dff}
+  .fan-card.dim{opacity:.28}
+
+  .flap-stage{position:relative; width:170px; height:110px; perspective:700px}
+  .flap-face{
+    position:absolute; inset:0; border-radius:14px; display:grid; place-items:center;
+    font-size:22px; font-weight:800; color:#0b0f15; transform-style:preserve-3d;
+    will-change:transform; backface-visibility:hidden;
+  }
+  .flap-line{position:absolute; left:0; right:0; top:50%; height:2px; background:rgba(0,0,0,.35); z-index:5}
+
+  .scramble{
+    font-size:26px; font-weight:800; letter-spacing:.4px; text-align:center; width:260px;
+    min-height:60px; display:grid; place-items:center; transition:transform .25s;
+  }
+  .scramble.pop{transform:scale(1.14)}
+
+  /* ---------- chips / radar / spiral / bounce ---------- */
+  .chips{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; width:260px}
+  .chip{
+    border-radius:10px; padding:9px 6px; text-align:center; font-size:11px; font-weight:700;
+    color:#b9c6da; background:#161d28; border:1px solid #263043; transition:.1s;
+  }
+  .chip.on{color:#0b0f15; border-color:transparent; transform:scale(1.06)}
+  .chip.win{outline:2px solid #fff; outline-offset:2px}
+
+  .radar{position:relative; width:240px; height:240px}
+  .radar-ring{position:absolute; z-index:0; inset:18px; border-radius:50%; border:1px solid #263043;
+    background:radial-gradient(circle,#131a25,#0d131c)}
+  .beam{
+    position:absolute; z-index:1; inset:18px; border-radius:50%; pointer-events:none;
+    background:conic-gradient(from 0deg, rgba(76,141,255,.0) 0deg, rgba(76,141,255,.0) 300deg, rgba(76,141,255,.55) 359deg, rgba(76,141,255,.9) 360deg);
+    will-change:transform;
+  }
+  .radar-label{
+    position:absolute; z-index:2; width:66px; margin-left:-33px; margin-top:-9px; text-align:center;
+    font-size:11px; font-weight:700; color:#aebbd0; transition:color .2s, transform .2s;
+  }
+  .radar-label.win{color:#fff; transform:scale(1.16)}
+
+  .spiral{position:relative; width:250px; height:220px}
+  .spiral-label{
+    position:absolute; left:50%; top:50%; width:88px; margin-left:-44px; margin-top:-10px;
+    text-align:center; font-size:12px; font-weight:700; will-change:transform;
+  }
+  .vortex-result{
+    position:absolute; inset:0; display:grid; place-items:center; font-size:20px; font-weight:800;
+    opacity:0; transition:opacity .25s; pointer-events:none;
+  }
+  .vortex-result.show{opacity:1}
+
+  .bounce-row{position:relative; width:270px; height:150px; display:flex; align-items:flex-end; gap:5px}
+  .bounce-tile{
+    flex:1; height:44px; border-radius:9px; display:grid; place-items:center; font-size:9px; font-weight:700;
+    color:#0b0f15; transition:.15s; white-space:nowrap; overflow:hidden;
+  }
+  .bounce-tile.win{transform:translateY(-8px); box-shadow:0 0 0 2px #fff}
+  .ball{position:absolute; width:24px; height:24px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#fff,#b9c8dd 65%,#7d8ea6);
+    box-shadow:0 6px 12px -6px #000; will-change:transform; z-index:4}
+
+  /* ---------- pendulum ---------- */
+  .pendulum{position:relative; width:280px; height:220px}
+  .pendulum-arm{position:absolute; left:50%; top:14px; width:3px; height:112px; margin-left:-1.5px;
+    background:linear-gradient(180deg,#5a6a85,#2b3647); transform-origin:50% 0%; will-change:transform}
+  .pendulum-bob{position:absolute; left:50%; top:120px; width:26px; height:26px; margin-left:-13px;
+    border-radius:50%; background:radial-gradient(circle at 35% 30%,#8fb6ff,#3b74d9); box-shadow:0 6px 14px -6px #000}
+  .pend-row{position:absolute; left:8px; right:8px; bottom:8px; display:flex; gap:4px}
+  .pend-item{flex:1; height:34px; border-radius:8px; display:grid; place-items:center; font-size:9px; font-weight:700;
+    color:#0b0f15; transition:.18s}
+  .pend-item.win{transform:translateY(-6px); box-shadow:0 0 0 2px #fff}
+
+  .confetti-wrap{position:relative; width:240px; height:170px; display:grid; place-items:center}
+  .confetti-card{
+    width:150px; height:96px; border-radius:16px; display:grid; place-items:center;
+    font-size:17px; font-weight:800; color:#0b0f15; background:#233049; color:#9fb2cc;
+    border:1px solid #31415c; transition:transform .2s;
+  }
+  .confetti-card.shake{animation:shake .12s linear infinite}
+  @keyframes shake{
+    0%{transform:translate(0,0) rotate(0)}25%{transform:translate(2px,-2px) rotate(1deg)}
+    50%{transform:translate(-2px,1px) rotate(-1deg)}75%{transform:translate(1px,2px) rotate(.6deg)}
+    100%{transform:translate(0,0) rotate(0)}
+  }
+  .confetti-card.win{transform:scale(1.06); color:#0b0f15; border-color:transparent}
+  .confetti-canvas{position:absolute; inset:0; pointer-events:none}
+
+  .hint{color:var(--muted); font-size:12px; padding:0 28px 26px; max-width:1560px; margin:0 auto}
+  kbd{background:#1b2330; border:1px solid #2b3646; border-bottom-width:2px; border-radius:5px; padding:0 5px; font-size:11px}
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>Randomix · roulette spin concepts</h1>
+  <div class="sub">20 ways to land on a random option. Star the ones you like, then tell me the numbers (e.g. <b>1, 3, 14</b>).</div>
+  <div class="spacer"></div>
+  <button class="btn primary" id="spin-all">Spin all</button>
+  <button class="btn" id="clear">Clear shortlist</button>
+  <div class="shortlist" id="shortlist">Shortlist: —</div>
+</header>
+
+<main id="grid"></main>
+<p class="hint">
+  Each card uses the same 8 sample options. The real app allows up to <b>30</b>: a wheel gets unreadable past ~12,
+  while tape, slot, chips and scramble scale to 30. Press <kbd>R</kbd> to replay the starred ones, <kbd>S</kbd> to spin all.
+</p>
+
+<script src="roulette-gallery.js"></script>
+</body>
+</html>
