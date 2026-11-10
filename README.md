@@ -174,6 +174,21 @@ sums, the magic ball answer pools and the two-answer custom threshold.
 - The app id `io.github.thenobody0817.Randomix` is used for local builds; rename it to your own
   reverse-DNS identifier if you publish the port.
 
+## Publishing
+
+The scripts used to publish this repository are part of it:
+
+```bash
+tool/download-gh.sh                 # local GitHub CLI in .tooling/, no root
+.tooling/gh/bin/gh auth login       # one-time browser login
+make deb                            # builds dist/randomix_<version>-1_<arch>.deb
+make publish                        # creates/updates the repo, tag and release
+```
+
+`publish.sh` installs a repository-local git credential helper that asks `gh`
+for the token on demand, so no credential is stored in the repository or in
+`~/.gitconfig`.
+
 ## License
 
 MIT. The port and the reused upstream assets keep the original copyright notice;
