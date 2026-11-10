@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../core/spin_style.dart';
 import '../services/sound_service.dart';
 import '../state/settings_controller.dart';
 import '../strings.dart';
@@ -10,6 +11,24 @@ import 'about_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
+
+  String _spinStyleLabel(RouletteSpinStyle style) => switch (style) {
+    RouletteSpinStyle.wheel => S.spinStyleWheel,
+    RouletteSpinStyle.coverflow => S.spinStyleCoverflow,
+    RouletteSpinStyle.chips => S.spinStyleChips,
+  };
+
+  String _spinStyleDescription(RouletteSpinStyle style) => switch (style) {
+    RouletteSpinStyle.wheel => S.spinStyleWheelDescription,
+    RouletteSpinStyle.coverflow => S.spinStyleCoverflowDescription,
+    RouletteSpinStyle.chips => S.spinStyleChipsDescription,
+  };
+
+  IconData _spinStyleIcon(RouletteSpinStyle style) => switch (style) {
+    RouletteSpinStyle.wheel => Icons.donut_large,
+    RouletteSpinStyle.coverflow => Icons.view_carousel_outlined,
+    RouletteSpinStyle.chips => Icons.sell_outlined,
+  };
 
   String _themeLabel(AppThemeMode mode) => switch (mode) {
     AppThemeMode.system => S.themeSystem,
@@ -118,6 +137,27 @@ class SettingsScreen extends StatelessWidget {
               value: settings.blob,
               onChanged: settings.setBlob,
             ),
+
+            _section(context, S.rouletteSettings),
+            ListTile(
+              title: const Text(S.spinStyleName),
+              subtitle: const Text(S.spinStyleDescription),
+            ),
+            for (final style in RouletteSpinStyle.values)
+              ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                leading: Icon(_spinStyleIcon(style)),
+                title: Text(_spinStyleLabel(style)),
+                subtitle: Text(_spinStyleDescription(style)),
+                trailing: settings.spinStyle == style
+                    ? Icon(
+                        Icons.check_circle,
+                        color: Theme.of(context).colorScheme.primary,
+                      )
+                    : const Icon(Icons.circle_outlined),
+                onTap: () => settings.setSpinStyle(style),
+              ),
+            const SizedBox(height: 8),
 
             _section(context, S.appBehavior),
 

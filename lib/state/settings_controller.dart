@@ -5,6 +5,7 @@ library;
 import 'package:flutter/foundation.dart';
 
 import '../core/dice_roller.dart';
+import '../core/spin_style.dart';
 import '../theme/accent_colors.dart';
 import 'prefs.dart';
 
@@ -39,6 +40,7 @@ class K {
   static const allowEquals = 'allow_equals';
   static const removeLast = 'remove_last';
   static const rudeAnswers = 'rude_answers';
+  static const spinStyle = 'spin_style';
   static const customAnswers = 'custom_answers';
   static const customAnswersActive = 'custom_answers_active';
   static const rouletteRangeMode = 'roulette_range_mode';
@@ -67,6 +69,7 @@ class SettingsController extends ChangeNotifier {
   bool allowEquals = false;
   bool removeLast = false;
   bool rudeAnswers = false;
+  RouletteSpinStyle spinStyle = RouletteSpinStyle.wheel;
   bool customAnswersActive = false;
   String customAnswers = '';
   String lastPage = 'roulette';
@@ -84,6 +87,7 @@ class SettingsController extends ChangeNotifier {
     allowEquals = _prefs.getBool(K.allowEquals);
     removeLast = _prefs.getBool(K.removeLast);
     rudeAnswers = _prefs.getBool(K.rudeAnswers);
+    spinStyle = RouletteSpinStyle.fromId(_prefs.getString(K.spinStyle));
     customAnswersActive = _prefs.getBool(K.customAnswersActive);
     customAnswers = _prefs.getString(K.customAnswers) ?? '';
     lastPage = _prefs.getString(K.lastPage) ?? 'roulette';
@@ -153,6 +157,13 @@ class SettingsController extends ChangeNotifier {
     await _prefs.setBool(K.rudeAnswers, value);
   }
 
+  Future<void> setSpinStyle(RouletteSpinStyle value) async {
+    if (spinStyle == value) return;
+    spinStyle = value;
+    notifyListeners();
+    await _prefs.setString(K.spinStyle, value.id);
+  }
+
   Future<void> setCustomAnswersActive(bool value) async {
     if (customAnswersActive == value) return;
     customAnswersActive = value;
@@ -197,6 +208,7 @@ class SettingsController extends ChangeNotifier {
     allowEquals = false;
     removeLast = false;
     rudeAnswers = false;
+    spinStyle = RouletteSpinStyle.wheel;
     customAnswersActive = false;
     customAnswers = '';
     notifyListeners();
@@ -209,6 +221,7 @@ class SettingsController extends ChangeNotifier {
     await _prefs.remove(K.allowEquals);
     await _prefs.remove(K.removeLast);
     await _prefs.remove(K.rudeAnswers);
+    await _prefs.remove(K.spinStyle);
     await _prefs.remove(K.customAnswers);
     await _prefs.remove(K.customAnswersActive);
   }

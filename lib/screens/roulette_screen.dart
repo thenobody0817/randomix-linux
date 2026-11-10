@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 
 import '../core/recent_store.dart';
 import '../core/roulette_logic.dart';
+import '../core/spin_style.dart';
 import '../services/sound_service.dart';
 import '../state/prefs.dart';
 import '../state/settings_controller.dart';
@@ -15,6 +16,7 @@ import '../strings.dart';
 import '../widgets/randomize_button.dart';
 import '../widgets/recent_sets_sheet.dart';
 import '../widgets/result_text.dart';
+import '../widgets/spin_visuals.dart';
 
 class RouletteScreen extends StatefulWidget {
   const RouletteScreen({super.key});
@@ -24,7 +26,7 @@ class RouletteScreen extends StatefulWidget {
 }
 
 class _RouletteScreenState extends State<RouletteScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late final ToolShortcuts _shortcuts;
 
   final TextEditingController _input = TextEditingController();
@@ -34,14 +36,25 @@ class _RouletteScreenState extends State<RouletteScreen>
 
   late final AnimationController _fade = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 1000),
-    reverseDuration: const Duration(milliseconds: 1500),
+    duration: const Duration(milliseconds: 500),
+    reverseDuration: const Duration(milliseconds: 250),
     value: 1,
+  );
+
+  /// Drives whichever spin visual is selected in the settings.
+  late final AnimationController _spin = AnimationController(
+    vsync: this,
+    duration: RouletteSpinStyle.wheel.duration,
   );
 
   List<String> _options = [];
   bool _rangeMode = false;
   bool _busy = false;
+  bool _spinning = false;
+  int _spinWinner = 0;
+  int _spinMin = 0;
+  int _spinMax = 0;
+  RouletteSpinStyle _spinStyle = RouletteSpinStyle.wheel;
   String? _result;
 
   @override
@@ -62,17 +75,19 @@ class _RouletteScreenState extends State<RouletteScreen>
         _options = [];
       }
     }
+    _spinStyle = context.read<SettingsController>().spinStyle;
     _shortcuts = context.read<ToolShortcuts>();
-    _shortcuts.register('roulette', _spin);
+    _shortcuts.register('roulette', _runSpin);
   }
 
   @override
   void dispose() {
-    _shortcuts.unregister('roulette', _spin);
+    _shortcuts.unregister('roulette', _runSpin);
     _input.dispose();
     _min.dispose();
     _max.dispose();
     _fade.dispose();
+    _spin.dispose();
     super.dispose();
   }
 
@@ -135,11 +150,14 @@ class _RouletteScreenState extends State<RouletteScreen>
 
   // -------------------------------------------------------------------- spin
 
-  Future<void> _spin() async {
+  Future<void> _runSpin() async {
     if (_busy) return;
     final settings = context.read<SettingsController>();
     final store = context.read<PrefsStore>();
     final sound = context.read<SoundController>();
+
+    late final String reveal;
+    var winnerIndex = 0;
 
     if (_rangeMode) {
       final range = RouletteLogic.parseRange(_min.text, _max.text);
@@ -147,46 +165,53 @@ class _RouletteScreenState extends State<RouletteScreen>
         _snack(S.wrongRange);
         return;
       }
-      setState(() => _busy = true);
-      await sound.play(SoundId.roulette);
-      await _fade.reverse();
-      if (!mounted) return;
-      final value = RouletteLogic.pickNumber(
-        _random,
-        min: range.min,
-        max: range.max,
-      );
-      setState(() => _result = '$value');
-      await _fade.forward();
-      if (!mounted) return;
-      setState(() => _busy = false);
-      return;
+      _spinMin = range.min;
+      _spinMax = range.max;
+      reveal =
+          '${RouletteLogic.pickNumber(_random, min: range.min, max: range.max)}';
+    } else {
+      if (_options.length < RouletteLogic.minOptionsToSpin) {
+        _snack(S.noEntryRoulette);
+        return;
+      }
+
+      final recents = RecentStore.decode(store.getString(K.recent));
+      final outcome = recents.add(List<String>.of(_options));
+      if (outcome == RecentAddResult.added) {
+        await store.setString(K.recent, recents.encode());
+      } else if (outcome == RecentAddResult.noRoom) {
+        _snack(S.noRecentRoom);
+      }
+
+      winnerIndex = _random.nextInt(_options.length);
+      reveal = _options[winnerIndex];
     }
 
-    if (_options.length < RouletteLogic.minOptionsToSpin) {
-      _snack(S.noEntryRoulette);
-      return;
-    }
+    setState(() {
+      _busy = true;
+      _spinning = true;
+      _spinStyle = settings.spinStyle;
+      _spinWinner = winnerIndex;
+      _result = null;
+    });
+    _fade.value = 0;
 
-    final recents = RecentStore.decode(store.getString(K.recent));
-    final outcome = recents.add(List<String>.of(_options));
-    if (outcome == RecentAddResult.added) {
-      await store.setString(K.recent, recents.encode());
-    } else if (outcome == RecentAddResult.noRoom) {
-      _snack(S.noRecentRoom);
-    }
-
-    setState(() => _busy = true);
     await sound.play(SoundId.roulette);
-    await _fade.reverse();
+    _spin.duration = _rangeMode
+        ? const Duration(milliseconds: 1400)
+        : _spinStyle.duration;
+    await _spin.forward(from: 0);
     if (!mounted) return;
-    final winner = RouletteLogic.pickOption(_options, _random);
-    setState(() => _result = winner);
+
+    setState(() {
+      _spinning = false;
+      _result = reveal;
+    });
     await _fade.forward();
     if (!mounted) return;
 
-    if (settings.removeLast) {
-      final index = _options.indexOf(winner);
+    if (!_rangeMode && settings.removeLast) {
+      final index = _options.indexOf(reveal);
       if (index >= 0) {
         setState(() => _options.removeAt(index));
         await _saveOptions();
@@ -311,10 +336,19 @@ class _RouletteScreenState extends State<RouletteScreen>
                     ),
                   ],
                   selected: {_rangeMode},
-                  onSelectionChanged: (values) => _setRangeMode(values.first),
+                  onSelectionChanged: _busy
+                      ? null
+                      : (values) => _setRangeMode(values.first),
                 ),
                 const SizedBox(height: 18),
-                if (_rangeMode)
+                if (_spinning &&
+                    !_rangeMode &&
+                    _spinStyle != RouletteSpinStyle.chips)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    child: _spinVisual(),
+                  )
+                else if (_rangeMode)
                   _rangeEditor(scheme)
                 else
                   _optionsEditor(scheme),
@@ -322,38 +356,74 @@ class _RouletteScreenState extends State<RouletteScreen>
             ),
           ),
         ),
-        FadeTransition(
-          opacity: _fade,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Flexible(
-                child: ResultText(
-                  value: _result,
-                  fontSize: _rangeMode ? 46 : 30,
-                  maxLines: _rangeMode ? null : 3,
-                ),
-              ),
-              if (_result != null)
-                IconButton(
-                  tooltip: S.copyResult,
-                  onPressed: _copyResult,
-                  icon: const Icon(Icons.copy_all_outlined, size: 20),
-                ),
-            ],
-          ),
-        ),
+        _resultArea(),
         const SizedBox(height: 20),
         RandomizeButton(
           label: S.spinRoulette,
           icon: Icons.autorenew,
           enabled: !_busy,
-          onPressed: _spin,
+          onPressed: _runSpin,
           onLongPress: _onLongPress,
           tooltip: S.longPressHint,
         ),
         const SizedBox(height: 24),
       ],
+    );
+  }
+
+  Widget _spinVisual() {
+    switch (_spinStyle) {
+      case RouletteSpinStyle.wheel:
+        return WheelSpinView(
+          progress: _spin,
+          options: _options,
+          winner: _spinWinner,
+        );
+      case RouletteSpinStyle.coverflow:
+        return CoverFlowSpinView(
+          progress: _spin,
+          options: _options,
+          winner: _spinWinner,
+        );
+      case RouletteSpinStyle.chips:
+        return const SizedBox.shrink();
+    }
+  }
+
+  Widget _resultArea() {
+    return AnimatedBuilder(
+      animation: _spin,
+      builder: (context, _) {
+        final counting = _spinning && _rangeMode;
+        final row = Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Flexible(
+              child: counting
+                  ? NumberReel(
+                      progress: _spin,
+                      min: _spinMin,
+                      max: _spinMax,
+                      fontSize: 46,
+                    )
+                  : ResultText(
+                      key: const Key('roulette_result'),
+                      value: _result,
+                      fontSize: _rangeMode ? 46 : 30,
+                      maxLines: _rangeMode ? null : 3,
+                    ),
+            ),
+            if (_result != null)
+              IconButton(
+                tooltip: S.copyResult,
+                onPressed: _copyResult,
+                icon: const Icon(Icons.copy_all_outlined, size: 20),
+              ),
+          ],
+        );
+        // The number count-up stays visible; everything else fades in.
+        return counting ? row : FadeTransition(opacity: _fade, child: row);
+      },
     );
   }
 
@@ -366,6 +436,7 @@ class _RouletteScreenState extends State<RouletteScreen>
             Expanded(
               child: TextField(
                 controller: _input,
+                enabled: !_busy,
                 textInputAction: TextInputAction.done,
                 onSubmitted: (_) => _addOption(),
                 decoration: InputDecoration(
@@ -378,7 +449,7 @@ class _RouletteScreenState extends State<RouletteScreen>
             ),
             const SizedBox(width: 8),
             FilledButton.tonal(
-              onPressed: _addOption,
+              onPressed: _busy ? null : _addOption,
               style: FilledButton.styleFrom(
                 padding: const EdgeInsets.all(20),
                 shape: const CircleBorder(),
@@ -391,7 +462,7 @@ class _RouletteScreenState extends State<RouletteScreen>
         Align(
           alignment: Alignment.centerLeft,
           child: OutlinedButton.icon(
-            onPressed: _openRecent,
+            onPressed: _busy ? null : _openRecent,
             icon: const Icon(Icons.history, size: 18),
             label: const Text(S.recentTitle),
           ),
@@ -407,19 +478,36 @@ class _RouletteScreenState extends State<RouletteScreen>
             ),
           )
         else
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            alignment: WrapAlignment.center,
-            children: [
-              for (var i = 0; i < _options.length; i++)
-                InputChip(
-                  label: Text(_options[i]),
-                  onDeleted: () => _removeOption(i),
-                  deleteIcon: const Icon(Icons.close, size: 18),
-                  deleteButtonTooltipMessage: S.removeOption,
-                ),
-            ],
+          AnimatedBuilder(
+            animation: _spin,
+            builder: (context, _) {
+              final active = _spinning && _spinStyle == RouletteSpinStyle.chips
+                  ? chipIndexAt(_spin.value, _options.length, _spinWinner)
+                  : -1;
+              return Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                alignment: WrapAlignment.center,
+                children: [
+                  for (var i = 0; i < _options.length; i++)
+                    InputChip(
+                      label: Text(_options[i]),
+                      onDeleted: _busy ? null : () => _removeOption(i),
+                      deleteIcon: const Icon(Icons.close, size: 18),
+                      deleteButtonTooltipMessage: S.removeOption,
+                      backgroundColor: active == i
+                          ? scheme.primaryContainer
+                          : null,
+                      labelStyle: active == i
+                          ? TextStyle(
+                              fontWeight: FontWeight.w700,
+                              color: scheme.onPrimaryContainer,
+                            )
+                          : null,
+                    ),
+                ],
+              );
+            },
           ),
       ],
     );
@@ -434,6 +522,7 @@ class _RouletteScreenState extends State<RouletteScreen>
             Expanded(
               child: TextField(
                 controller: _min,
+                enabled: !_busy,
                 keyboardType: TextInputType.number,
                 inputFormatters: [
                   FilteringTextInputFormatter.allow(RegExp(r'[0-9-]')),
@@ -449,6 +538,7 @@ class _RouletteScreenState extends State<RouletteScreen>
             Expanded(
               child: TextField(
                 controller: _max,
+                enabled: !_busy,
                 keyboardType: TextInputType.number,
                 inputFormatters: [
                   FilteringTextInputFormatter.allow(RegExp(r'[0-9-]')),
@@ -466,7 +556,7 @@ class _RouletteScreenState extends State<RouletteScreen>
         Align(
           alignment: Alignment.centerLeft,
           child: OutlinedButton.icon(
-            onPressed: _openRecent,
+            onPressed: _busy ? null : _openRecent,
             icon: const Icon(Icons.history, size: 18),
             label: const Text(S.recentTitle),
           ),

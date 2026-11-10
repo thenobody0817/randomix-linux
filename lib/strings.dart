@@ -112,6 +112,21 @@ class S {
 
   // Settings
   static const customization = 'Customization';
+  static const rouletteSettings = 'Roulette';
+  static const spinStyleName = 'Spin animation';
+  static const spinStyleDescription =
+      'How the roulette reveals the result. Range mode always counts through '
+      'numbers.';
+  static const spinStyleWheel = 'Wheel';
+  static const spinStyleWheelDescription =
+      'A wheel turns until the winner is under the pointer, with the current '
+      'option read out in the centre.';
+  static const spinStyleCoverflow = 'Cover flow';
+  static const spinStyleCoverflowDescription =
+      'Cards slide past each other in perspective until the winner is in front.';
+  static const spinStyleChips = 'Chips';
+  static const spinStyleChipsDescription =
+      'Your option chips light up in turn and stop on the winner.';
   static const appBehavior = 'App behavior';
   static const themeName = 'App theme';
   static const themeDescription =
@@ -154,7 +169,7 @@ class S {
   static const spaceHint = 'Space';
   static const keyboardShortcuts = 'Keyboard shortcuts';
   static const settingsRestored = 'Settings restored to their defaults';
-  static const appVersion = '4.0';
+  static const appVersion = '4.1';
   static const introReplay = 'Introduction replayed';
   static const keyboardHint =
       'Keyboard: Space triggers the active tool, Esc closes dialogs.';

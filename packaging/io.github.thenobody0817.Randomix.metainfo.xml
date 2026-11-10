@@ -60,7 +60,12 @@
   </content_rating>
 
   <releases>
-    <release version="4.0" date="2026-11-10">
+    <release version="4.1.0" date="2026-11-10">
+      <description>
+        <p>Choose the roulette spin animation in the settings: a wheel with a centre readout, a cover flow of cards, or the option chips lighting up in turn.</p>
+      </description>
+    </release>
+    <release version="4.0.0" date="2026-11-10">
       <description>
         <p>First Linux desktop release: the four randomizers, recents, presets, themes and settings.</p>
       </description>

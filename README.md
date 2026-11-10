@@ -19,7 +19,7 @@ Four randomizers share one window, with the same rules as the Android app:
 
 | Tool | Behavior |
 |---|---|
-| **Roulette** | Options mode (up to 30 chips, duplicate protection, optional auto-remove of the winner) or Range mode (inclusive integer range, `min < max`). Presets for `A–Z`, `1–100` and a 52-card deck. Recent option sets: restore, pin, delete, 10 sets max. |
+| **Roulette** | Options mode (up to 30 chips, duplicate protection, optional auto-remove of the winner) or Range mode (inclusive integer range, `min < max`). Presets for `A–Z`, `1–100` and a 52-card deck. Recent option sets: restore, pin, delete, 10 sets max. Three selectable spin animations. |
 | **Coin** | Heads or tails, 1.5 s flip, 2 s cooldown, streak messages at 3, 5, 10 and 20. |
 | **Dice** | D4, D6, D8, D10, D12, D20, one to ten dice, plus the 3 vs 3 mode (six D6, two team sums). Pip face for a single D6. |
 | **Magic Ball** | 30 default answers, 6 optional rude answers, or your own answers (semicolon separated, at least two). |
@@ -28,6 +28,10 @@ Around them:
 
 - Light, dark and Amoled themes; 12 accent colours (the upstream palette) plus the
   desktop accent where the system exposes one; animated blob background.
+- Selectable roulette spin animation, under *Settings → Roulette*:
+  **Wheel** (turns under a fixed pointer, with the current option read out in the
+  hub), **Cover flow** (cards sliding past in perspective) or **Chips** (the
+  option chips light up in turn). Range mode counts through numbers instead.
 - Sound effects (toggle), descriptions toggle, equal options, remove-last-chosen,
   last used page remembered, first-run introduction, about page with links.
 - Keyboard: **Space** throws the active tool.
@@ -153,7 +157,8 @@ sums, the magic ball answer pools and the two-answer custom threshold.
 ## Verified on this machine
 
 - `flutter analyze` — no issues.
-- `flutter test` — 64 tests passing.
+- `flutter test` — 76 tests passing, including each spin animation, a 30-option
+  wheel, the minimum 440 px window width and the range number count-up.
 - `flutter build linux --release` — bundle at `build/linux/x64/release/bundle`.
 - The release binary launches against the system GTK 3 runtime (3.24.52) and
   writes its preferences; `dist/randomix_4.0.0-1_amd64.deb` is 8 MB, all
@@ -161,6 +166,22 @@ sums, the magic ball answer pools and the two-answer custom threshold.
 - `flatpak run io.github.thenobody0817.Randomix` — installed as a user Flatpak from
   `org.freedesktop.Platform//25.08`, launches and persists state under
   `~/.var/app/io.github.thenobody0817.Randomix`.
+
+## Spin animations
+
+The roulette can reveal its result in three ways, chosen in the settings:
+
+| Style | How it looks | Scales to 30 options |
+|---|---|---|
+| Wheel | The disc turns and stops with the winner under the pointer; the hub reads out the option currently passing it. | Yes — slice labels are dropped past 12 options, the hub carries the text. |
+| Cover flow | Cards slide past each other in 3D until the winner sits in front. | Yes |
+| Chips | The existing option chips light up in a decelerating race. | Yes |
+
+Range mode ignores the style and counts through numbers for 1.4 s before landing
+on the value, so the two modes do not feel inconsistent.
+
+The three concepts were prototyped first in a standalone HTML gallery; see
+[`mockups/`](mockups/) for the full set of 20 ideas and which ones were chosen.
 
 ## Differences from the Android app
 

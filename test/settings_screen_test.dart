@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:randomix/core/spin_style.dart';
 import 'package:randomix/screens/settings_screen.dart';
 import 'package:randomix/state/settings_controller.dart';
 import 'package:randomix/strings.dart';
@@ -48,12 +49,33 @@ void main() {
     expect(harness.store.getString('accent_color'), 'violet');
   });
 
+  testWidgets('the roulette spin style can be changed', (tester) async {
+    setSurface(tester, size: const Size(900, 2600));
+    final harness = TestHarness();
+
+    await tester.pumpWidget(harness.wrap(const SettingsScreen()));
+    await tester.pump();
+
+    expect(harness.settings.spinStyle, RouletteSpinStyle.wheel);
+
+    await tester.tap(find.text(S.spinStyleCoverflow));
+    await tester.pump();
+
+    expect(harness.settings.spinStyle, RouletteSpinStyle.coverflow);
+    expect(harness.store.getString('spin_style'), 'coverflow');
+
+    await tester.tap(find.text(S.spinStyleChips));
+    await tester.pump();
+    expect(harness.store.getString('spin_style'), 'chips');
+  });
+
   testWidgets('reset restores the defaults after confirmation', (tester) async {
     setSurface(tester, size: const Size(900, 2800));
     final harness = TestHarness({
       'hide_descriptions': true,
       'accent_color': 'crimson',
       'allow_equals': true,
+      'spin_style': 'chips',
     });
 
     await tester.pumpWidget(harness.wrap(const SettingsScreen()));
@@ -74,6 +96,7 @@ void main() {
     expect(harness.settings.hideDescriptions, isFalse);
     expect(harness.settings.allowEquals, isFalse);
     expect(harness.settings.accent, Accent.blue);
+    expect(harness.settings.spinStyle, RouletteSpinStyle.wheel);
     await tester.pump(const Duration(seconds: 5));
   });
 }

@@ -14,9 +14,10 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 GH="${GH:-$ROOT/.tooling/gh/bin/gh}"
 OWNER="${OWNER:-thenobody0817}"
 REPO="${REPO:-randomix-linux}"
-VERSION="${VERSION:-4.0.0}"
+VERSION="${VERSION:-$(sed -n 's/^version: *\([^+ ]*\)/\1/p' "$ROOT/pubspec.yaml")}"
 TAG="v$VERSION"
 DEB="$ROOT/dist/randomix_${VERSION}-1_amd64.deb"
+NOTES="${NOTES:-$ROOT/packaging/release-notes-$VERSION.md}"
 DESCRIPTION="Randomix for Linux — a Flutter port of the Android random decision maker"
 
 if [[ ! -x "$GH" ]]; then
@@ -29,6 +30,10 @@ if ! "$GH" auth status >/dev/null 2>&1; then
 fi
 if [[ ! -d "$ROOT/.git" ]]; then
   echo "error: $ROOT is not a git repository" >&2
+  exit 1
+fi
+if [[ ! -f "$NOTES" ]]; then
+  echo "error: release notes not found at $NOTES" >&2
   exit 1
 fi
 if [[ ! -f "$DEB" ]]; then
@@ -75,7 +80,7 @@ if ! "$GH" release view "$TAG" --repo "$OWNER/$REPO" >/dev/null 2>&1; then
   "$GH" release create "$TAG" "$DEB" \
     --repo "$OWNER/$REPO" \
     --title "Randomix $VERSION for Linux" \
-    --notes-file "$ROOT/packaging/release-notes.md"
+    --notes-file "$NOTES"
 else
   echo "   release $TAG exists, updating the asset"
   "$GH" release upload "$TAG" "$DEB" --repo "$OWNER/$REPO" --clobber
