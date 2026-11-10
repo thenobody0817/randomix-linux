@@ -6,7 +6,7 @@ SHELL := /bin/bash
 ENV := source tool/env.sh &&
 FLUTTER := $(ENV) flutter
 
-.PHONY: help bootstrap sysroot run test analyze format build bundle deb flatpak flatpak-run clean distclean
+.PHONY: help bootstrap sysroot run test analyze format build bundle deb flatpak flatpak-run publish clean distclean
 
 help:
 	@echo "make bootstrap   load dependencies"
@@ -17,6 +17,7 @@ help:
 	@echo "make deb         build dist/randomix_<version>-1_<arch>.deb"
 	@echo "make flatpak     build and install the Flatpak (user installation)"
 	@echo "make flatpak-run launch the installed Flatpak"
+	@echo "make publish     push to GitHub and create the release"
 	@echo "make clean       remove build output"
 
 bootstrap:
@@ -50,6 +51,10 @@ flatpak: build
 
 flatpak-run:
 	flatpak run io.github.thenobody0817.Randomix
+
+# Requires a logged-in gh: tool/download-gh.sh && .tooling/gh/bin/gh auth login
+publish:
+	bash tool/publish.sh
 
 clean:
 	$(ENV) flutter clean
